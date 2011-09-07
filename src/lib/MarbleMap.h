@@ -200,6 +200,8 @@ class MARBLE_EXPORT MarbleMap : public QObject
      */
     qreal centerLatitude() const;
 
+    qreal heading() const;
+
     QVector<const GeoDataPlacemark*> whichFeatureAt( const QPoint& ) const;
 
     /**
@@ -418,6 +420,8 @@ class MARBLE_EXPORT MarbleMap : public QObject
      * @param  lon  the new value for the longitude in degree
      */
     void setCenterLongitude( qreal lon );
+
+    void setHeading( qreal heading );
 
     /**
      * @brief  Get the Projection used for the map
