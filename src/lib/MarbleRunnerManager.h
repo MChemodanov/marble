@@ -60,7 +60,6 @@ public:
       * @see searchFinished signal indicates all runners are finished.
       */
     void findPlacemarks( const QString& searchTerm );
-    QVector<GeoDataPlacemark*> searchPlacemarks( const QString& searchTerm );
 
     /**
       * Find the address and other meta information for a given geoposition.
@@ -70,7 +69,6 @@ public:
       * @see reverseGeocodingFinished signal indicates all runners are finished.
       */
     void reverseGeocoding( const GeoDataCoordinates &coordinates );
-    QString searchReverseGeocoding( const GeoDataCoordinates &coordinates );
 
     /**
       * Download routes traversing the stopover points in the given route request
@@ -80,7 +78,6 @@ public:
       * @see routingFinished signal indicates all runners are finished.
       */
     void retrieveRoute( const RouteRequest *request );
-    QVector<GeoDataDocument*> searchRoute( const RouteRequest *request );
 
     /**
       * Parse the file using the runners for various formats
@@ -90,7 +87,6 @@ public:
       * @see parsingFinished signal indicates all runners are finished.
       */
     void parseFile( const QString& fileName, DocumentRole role = UserDocument );
-    GeoDataDocument* openFile( const QString& fileName, DocumentRole role = UserDocument );
 
 signals:
     /**

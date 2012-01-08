@@ -33,37 +33,23 @@ class MarbleRunnerManagerTest : public QObject
 private slots:
     void initTestCase();// will be called before the first testfunction is executed.
     void cleanupTestCase();// will be called after the last testfunction was executed.
-    void init(){};// will be called before each testfunction is executed.
-    void cleanup(){};// will be called after every testfunction.
-
-    void testSyncPlacemarks();
 
     void testAsyncPlacemarks_data();
     void testAsyncPlacemarks();
 
-    void testSyncReverse();
-
     void testAsyncReverse_data();
     void testAsyncReverse();
 
-    void testSyncRouting();
-
     void testAsyncRouting_data();
     void testAsyncRouting();
-
-    void testSyncParsing();
 
     void testAsyncParsing_data();
     void testAsyncParsing();
 
 public:
     PluginManager m_pluginManager;
-    int m_time;
-    QString m_name;
     GeoDataCoordinates m_coords;
     GeoDataCoordinates m_coords2;
-    RouteRequest m_request;
-    QString m_fileName;
 };
 
 void MarbleRunnerManagerTest::initTestCase()
@@ -71,8 +57,8 @@ void MarbleRunnerManagerTest::initTestCase()
     // MarbleDebug::enable = true;
     MarbleDirs::setMarbleDataPath( DATA_PATH );
     MarbleDirs::setMarblePluginPath( PLUGIN_PATH );
-    m_time = 30000;
-    m_name = "Berlin";
+
+    qRegisterMetaType<QList<GeoDataCoordinates> >( "QList<GeoDataCoordinates>" );
 
     qRegisterMetaType<QList<GeoDataCoordinates> >( "QList<GeoDataCoordinates>" );
 
@@ -81,48 +67,12 @@ void MarbleRunnerManagerTest::initTestCase()
 
     m_coords2.setLatitude(52.52665, GeoDataCoordinates::Degree );
     m_coords2.setLongitude(13.39032, GeoDataCoordinates::Degree );
-
-    m_request.append( m_coords );
-    m_request.append( m_coords2 );
-
-    m_fileName = MarbleDirs::path( "placemarks/otherplacemarks.cache" );
 }
 
 void MarbleRunnerManagerTest::cleanupTestCase()
 {
 }
 
-void MarbleRunnerManagerTest::testSyncPlacemarks()
-{
-    MarbleRunnerManager m_runnerManager(&m_pluginManager, this);
-
-    QSignalSpy finishSpy( &m_runnerManager, SIGNAL(placemarkSearchFinished()) );
-    QSignalSpy resultSpy( &m_runnerManager, SIGNAL(searchResultChanged(QVector<GeoDataPlacemark*>)) );
-
-    QCOMPARE( finishSpy.count(), 0 );
-    QCOMPARE( resultSpy.count(), 0 );
-
-    QTime timer;
-    timer.start();
-    QVector<GeoDataPlacemark*> placemarks = m_runnerManager.searchPlacemarks(m_name);
-
-    QVERIFY( timer.elapsed() < m_time );
-    QCOMPARE( resultSpy.count(), 1 );
-    QVERIFY( placemarks.size() > 0 );
-    QCOMPARE( finishSpy.count(), 1 );
-
-    // second search is optimised
-    placemarks.clear();
-    finishSpy.clear();
-    resultSpy.clear();
-    timer.start();
-    placemarks = m_runnerManager.searchPlacemarks(m_name);
-
-    QVERIFY( timer.elapsed() < m_time );
-    QCOMPARE( resultSpy.count(), 1 );
-    QVERIFY( placemarks.size() > 0 );
-    QCOMPARE( finishSpy.count(), 1 );
-}
 
 void MarbleRunnerManagerTest::testAsyncPlacemarks_data()
 {
@@ -150,39 +100,6 @@ void MarbleRunnerManagerTest::testAsyncPlacemarks()
 
     QCOMPARE( resultSpy.count(), 1 );
     QCOMPARE( finishSpy.count(), 1 );
-
-    QThreadPool::globalInstance()->waitForDone();
-}
-
-void MarbleRunnerManagerTest::testSyncReverse()
-{
-    MarbleRunnerManager m_runnerManager(&m_pluginManager, this);
-
-    QSignalSpy finishSpy( &m_runnerManager, SIGNAL(reverseGeocodingFinished()) );
-    QSignalSpy resultSpy( &m_runnerManager, SIGNAL(reverseGeocodingFinished(GeoDataCoordinates,GeoDataPlacemark)) );
-
-    QCOMPARE( finishSpy.count(), 0 );
-    QCOMPARE( resultSpy.count(), 0 );
-
-    QTime timer;
-    timer.start();
-    QString placemark = m_runnerManager.searchReverseGeocoding( m_coords );
-
-    QVERIFY( timer.elapsed() < m_time );
-    QCOMPARE( resultSpy.count(), 1 );
-    QVERIFY( !placemark.isEmpty() );
-    QCOMPARE( finishSpy.count(), 1 );
-
-    // second search is optimised
-    finishSpy.clear();
-    resultSpy.clear();
-    timer.start();
-    placemark = m_runnerManager.searchReverseGeocoding( m_coords );
-
-    QVERIFY( timer.elapsed() < m_time );
-    QCOMPARE( resultSpy.count(), 1 );
-    QVERIFY( !placemark.isEmpty() );
-    QCOMPARE( finishSpy.count(), 1 );
 }
 
 void MarbleRunnerManagerTest::testAsyncReverse_data()
@@ -209,28 +126,6 @@ void MarbleRunnerManagerTest::testAsyncReverse()
     loop.exec();
 
     QCOMPARE( resultSpy.count(), 1 );
-    QCOMPARE( finishSpy.count(), 1 );
-
-    QThreadPool::globalInstance()->waitForDone();
-}
-
-void MarbleRunnerManagerTest::testSyncRouting()
-{
-    MarbleRunnerManager m_runnerManager(&m_pluginManager, this);
-
-    QSignalSpy finishSpy( &m_runnerManager, SIGNAL(routingFinished()) );
-    QSignalSpy resultSpy( &m_runnerManager, SIGNAL( routeRetrieved(GeoDataDocument*)) );
-
-    QCOMPARE( finishSpy.count(), 0 );
-    QCOMPARE( resultSpy.count(), 0 );
-
-    QTime timer;
-    timer.start();
-    QVector<GeoDataDocument*> routes = m_runnerManager.searchRoute( &m_request );
-
-    QVERIFY( timer.elapsed() < m_time );
-    QVERIFY( resultSpy.count() > 0 );
-    QVERIFY( !routes.isEmpty() );
     QCOMPARE( finishSpy.count(), 1 );
 }
 
@@ -264,28 +159,6 @@ void MarbleRunnerManagerTest::testAsyncRouting()
 
     QVERIFY( resultSpy.count() > 0 );
     QCOMPARE( finishSpy.count(), 1 );
-
-    QThreadPool::globalInstance()->waitForDone();
-}
-
-void MarbleRunnerManagerTest::testSyncParsing()
-{
-    MarbleRunnerManager m_runnerManager(&m_pluginManager, this);
-
-    QSignalSpy finishSpy( &m_runnerManager, SIGNAL( parsingFinished()) );
-    QSignalSpy resultSpy( &m_runnerManager, SIGNAL( parsingFinished(GeoDataDocument*,QString)) );
-
-    QCOMPARE( finishSpy.count(), 0 );
-    QCOMPARE( resultSpy.count(), 0 );
-
-    QTime timer;
-    timer.start();
-    GeoDataDocument* file = m_runnerManager.openFile( m_fileName );
-
-    QVERIFY( timer.elapsed() < m_time );
-    QVERIFY( resultSpy.count() > 0 );
-    QVERIFY( file != 0 );
-    QCOMPARE( finishSpy.count(), 1 );
 }
 
 void MarbleRunnerManagerTest::testAsyncParsing_data()
@@ -312,11 +185,8 @@ void MarbleRunnerManagerTest::testAsyncParsing()
 
     loop.exec();
 
-
     QVERIFY( resultSpy.count() > 0 );
     QCOMPARE( finishSpy.count(), 1 );
-
-    QThreadPool::globalInstance()->waitForDone();
 }
 
 }
