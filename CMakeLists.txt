@@ -11,6 +11,7 @@ SET(CMAKE_COLOR_MAKEFILE ON)
 option(TILES_AT_COMPILETIME "Create the data for the Atlas map at compiletime" ON)
 option(QTONLY "Create Marble version without KDE dependencies" OFF)
 option(MOBILE "Create a Marble version optimized for handheld devices")
+option(BUILD_EXAMPLES "Build examples" ON)
 
 ####################################################
 # Build a D-Bus interface for marble
@@ -346,6 +347,9 @@ add_subdirectory(data)
 
 include(DistTarget)
 
+IF(BUILD_EXAMPLES)
+    add_subdirectory(examples)
+ENDIF(BUILD_EXAMPLES)
 add_subdirectory(tests)
 
 ####################################################
