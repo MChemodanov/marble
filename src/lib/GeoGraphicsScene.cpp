@@ -97,22 +97,14 @@ QList< GeoGraphicsItem* > GeoGraphicsScene::items() const
 QList< GeoGraphicsItem* > GeoGraphicsScene::items( const Marble::GeoDataLatLonAltBox& box, int maxZoomLevel ) const
 {
     QList< GeoGraphicsItem* > result;
-    QRect rect;
     qreal north, south, east, west;
     box.boundaries( north, south, east, west );
-    TileId key;
-    int zoomLevel = maxZoomLevel < s_tileZoomLevel ? maxZoomLevel : s_tileZoomLevel;
+    const int zoomLevel = maxZoomLevel < s_tileZoomLevel ? maxZoomLevel : s_tileZoomLevel;
 
-    key = d->coordToTileId( GeoDataCoordinates(west, north, 0), zoomLevel );
-    rect.setLeft( key.x() );
-    rect.setTop( key.y() );
-
-    key = d->coordToTileId( GeoDataCoordinates(east, south, 0), zoomLevel );
-    rect.setRight( key.x() );
-    rect.setBottom( key.y() );
-    
-    TileCoordsPyramid pyramid( 0, zoomLevel );
-    pyramid.setBottomLevelCoords( rect );
+    const TileId idTopLeft = d->coordToTileId( GeoDataCoordinates(west, north, 0), zoomLevel );
+    const TileId idBottomRight = d->coordToTileId( GeoDataCoordinates(east, south, 0), zoomLevel );
+    const QRect rect = QRect( QPoint( idTopLeft.x(), idTopLeft.y() ), QPoint( idBottomRight.x(), idBottomRight.y() ) );
+    const TileCoordsPyramid pyramid( 0, zoomLevel, rect );
 
     for ( int level = pyramid.topLevel(); level <= pyramid.bottomLevel(); ++level ) {
         QRect const coords = pyramid.coords( level );

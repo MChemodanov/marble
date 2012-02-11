@@ -64,6 +64,17 @@ void PntRunner::parseFile( const QString &fileName, DocumentRole role = UnknownD
     GeoDataMultiGeometry *geom = new GeoDataMultiGeometry;
     placemark->setGeometry( geom );
 
+    int coastLine = 1001;
+    int countryBorder = 2000;
+    int internalPoliticalBorder = 4000;
+    int island = 5001;
+    int lake = 6001;
+    int river = 7001;
+    int customGlaciersLakesIslands = 8000;
+    int customPoliticalBorder = 9001;
+    int customPoliticalBorder2 = 14001;
+    int customDateline = 19000;
+
     int count = 0;
     bool error = false;
     while( !stream.atEnd() || error ){
@@ -95,67 +106,70 @@ void PntRunner::parseFile( const QString &fileName, DocumentRole role = UnknownD
             /* header represents level of detail */
             /* nothing to do */
         }
-        else if ( header < 1000 ) {
-            /* invalid header */
-            mDebug() << Q_FUNC_INFO << "invalid header:" << header << "in" << fileName << "at" << count;
-            error = true;
-            break;
-        }
-        else if ( header < 2000 ) {
+        else if ( header == coastLine ) {
             /* header represents start of coastline */
             geom->append( new GeoDataLinearRing );
+            coastLine++;
         }
-        else if ( header < 4000 ) {
+        else if ( header == countryBorder ) {
             /* header represents start of country border */
             geom->append( new GeoDataLinearRing );
+            countryBorder++;
         }
-        else if ( header < 5000 ) {
+        else if ( header == internalPoliticalBorder ) {
             /* header represents start of internal political border */
             geom->append( new GeoDataLinearRing );
+            internalPoliticalBorder++;
         }
-        else if ( header < 6000 ) {
+        else if ( header == island ) {
             /* header represents start of island */
             geom->append( new GeoDataLinearRing );
+            island++;
         }
-        else if ( header < 7000 ) {
+        else if ( header == lake ) {
             /* header represents start of lake */
             geom->append( new GeoDataLineString );
+            lake++;
         }
-        else if ( header < 8000 ) {
+        else if ( header == river ) {
             /* header represents start of river */
             geom->append( new GeoDataLinearRing );
+            river++;
         }
-        else if ( header < 9000 ) {
+        else if ( header == customGlaciersLakesIslands ) {
             /* custom header represents start of glaciers, lakes or islands */
             geom->append( new GeoDataLinearRing );
+            customGlaciersLakesIslands++;
         }
-        else if ( header < 10000 ) {
+        else if ( header == customPoliticalBorder ) {
             /* custom header represents start of political borders */
             geom->append( new GeoDataLinearRing );
+            customPoliticalBorder++;
         }
-        else if ( header < 14000 ) {
-            /* invalid header */
-            mDebug() << Q_FUNC_INFO << "invalid header:" << header << "in" << fileName << "at" << count;
-            error = true;
-            break;
-        }
-        else if ( header < 15000 ) {
+        else if ( header == customPoliticalBorder2 ) {
             /* custom header represents start of political borders */
             geom->append( new GeoDataLinearRing );
+            customPoliticalBorder2++;
         }
-        else if ( header < 19000 ) {
-            /* invalid header */
-            mDebug() << Q_FUNC_INFO << "invalid header:" << header << "in" << fileName << "at" << count;
-            error = true;
-            break;
-        }
-        else if ( header < 20000 ) {
+        else if ( header == customDateline ) {
             /* custom header represents start of dateline */
             geom->append( new GeoDataLineString );
+            customDateline++;
         }
         else {
             /* invalid header */
-            mDebug() << Q_FUNC_INFO << "invalid header:" << header << "in" << fileName << "at" << count;
+            mDebug() << Q_FUNC_INFO
+                      << "invalid header:" << header << "in" << fileName << "at" << count << endl
+                      << "expected:" << coastLine << ","
+                                     << countryBorder << ","
+                                     << internalPoliticalBorder << ","
+                                     << island << ","
+                                     << lake << ","
+                                     << river << ","
+                                     << customGlaciersLakesIslands << ","
+                                     << customPoliticalBorder << ","
+                                     << customPoliticalBorder2 << ", or"
+                                     << customDateline;
             error = true;
             break;
         }

@@ -23,7 +23,7 @@ namespace Marble
 class MARBLE_EXPORT TileCoordsPyramid
 {
  public:
-    TileCoordsPyramid( int const topLevel, int const bottomLevel );
+    TileCoordsPyramid( int const topLevel, int const bottomLevel, QRect const &bottomLevelCoords = QRect() );
     TileCoordsPyramid( TileCoordsPyramid const & other );
     TileCoordsPyramid();
     TileCoordsPyramid & operator=( TileCoordsPyramid const & rhs );

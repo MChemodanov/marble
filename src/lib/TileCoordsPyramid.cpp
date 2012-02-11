@@ -21,23 +21,24 @@ namespace Marble
 class TileCoordsPyramid::Private
 {
 public:
-    Private( int const topLevel, int const bottomLevel );
+    Private( int const topLevel, int const bottomLevel, QRect const &bottomLevelCoords );
 
     int m_topLevel;
     int m_bottomLevel;
     QRect m_bottomLevelCoords;
 };
 
-TileCoordsPyramid::Private::Private( int const topLevel, int const bottomLevel )
+TileCoordsPyramid::Private::Private( int const topLevel, int const bottomLevel, QRect const &bottomLevelCoords )
     : m_topLevel( topLevel ),
-      m_bottomLevel( bottomLevel )
+      m_bottomLevel( bottomLevel ),
+      m_bottomLevelCoords( bottomLevelCoords )
 {
     Q_ASSERT( m_topLevel <= m_bottomLevel );
 }
 
 
-TileCoordsPyramid::TileCoordsPyramid( int const topLevel, int const bottomLevel )
-    : d( new Private( topLevel, bottomLevel ))
+TileCoordsPyramid::TileCoordsPyramid( int const topLevel, int const bottomLevel, QRect const &bottomLevelCoords )
+    : d( new Private( topLevel, bottomLevel, bottomLevelCoords ) )
 {
 }
 
@@ -47,7 +48,7 @@ TileCoordsPyramid::TileCoordsPyramid( TileCoordsPyramid const & other )
 }
 
 TileCoordsPyramid::TileCoordsPyramid()
-    :d( new Private( 0, 0 ) )
+    :d( new Private( 0, 0, QRect() ) )
 {
 
 }
